@@ -5,26 +5,7 @@
             [secretary.core :as secretary :include-macros true]
             [accountant.core :as accountant]))
 
-(defonce state (atom {}))
-
-;; -------------------------
-;; Utility
-(defn input-map [midi]
-  (when midi
-   (->> midi
-        .-inputs
-        (.entries)
-        es6-iterator-seq
-        js->clj
-        (into {}))))
-
-;; -------------------------
-;; Components
-(defn midi-input-list []
-  (let [inputs (:midi-inputs @state)]
-    [:ul
-     (for [input (vals inputs)]
-       ^{:key input.id} [:li input.name])]))
+(defonce midi-state (reagent.core/atom {}))
 
 ;; -------------------------
 ;; Views
@@ -32,7 +13,7 @@
 (defn home-page []
   [:div [:h2 "Welcome to five-tones"]
    [:div [:a {:href "/about"} "go to about page"]]
-   (midi-input-list)])
+   (components/midi-control midi-state)])
 
 (defn about-page []
   [:div [:h2 "About five-tones"]
@@ -54,15 +35,14 @@
 ;; Initialize app
 
 (defn midi-state-change [event]
-  ;; just swap out the whole thing - HACKATHON
   (js/console.log "Got midi change event")
-  (swap! state assoc :midi-inputs (input-map event.target)))
+  (swap! midi-state assoc :last-change event))
 
 (defn init-midi []
   (-> (js/navigator.requestMIDIAccess)
       (.then (fn [midi]
                (js/console.log "Got midi access!")
-               (swap! state assoc :midi-inputs (input-map midi))
+               (swap! midi-state assoc :access midi)
                (aset midi "onstatechange" midi-state-change))
              #(js/console.log "failed to init midi"))))
 
