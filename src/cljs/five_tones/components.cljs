@@ -10,20 +10,28 @@
         js->clj
         (into {}))))
 
-(defn current-input-available [current all]
+(defn current-input-available? [current all]
   (and (some? current)
        (some? all)
        (all current.id)))
+
+(defn on-midi-message [message]
+  (js/console.log message))
+
+(defn set-current-input! [state input]
+  (when-let [old-input (:current-input @state)]
+    (aset old-input "onmidimessage" nil))
+  (aset input "onmidimessage" on-midi-message)
+  (swap! state assoc :current-input input))
 
 (defn midi-input-list [state]
   (let [current-input (:current-input @state)
         inputs        (input-map (:access @state))] 
     ;; if our currently-selected input is no longer available, ditch it
-    (when-not (current-input-available current-input inputs)
-      (swap! state assoc :current-input
-             (if (empty? inputs) nil (last (vals inputs)))))
+    (when-not (current-input-available? current-input inputs)
+      (set-current-input! state (if (empty? inputs) nil (last (vals inputs)))))
     [:select
-     {:on-change #(swap! state assoc :current-input (inputs (-> % .-target .-value)))
+     {:on-change #(set-current-input! state (inputs (-> % .-target .-value)))
       :value (if current-input current-input.id nil)}
      (for [input (vals inputs)]
        ^{:key input.id}
