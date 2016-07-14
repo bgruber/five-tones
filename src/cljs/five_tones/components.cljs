@@ -15,8 +15,26 @@
        (some? all)
        (all current.id)))
 
+(defn raw-midi->note [raw-midi]
+  (if (not (= 3 (count raw-midi)))
+    nil ;; proper midi messages have 3 bytes
+    (let [[message-byte note velocity] raw-midi]
+      {:type (case message-byte
+                  144 :noteon
+                  128 :noteoff
+                  nil)
+       :pitch note
+       :velocity velocity})))
+
+(def RING-MAX-SIZE 10) ;; TODO make this the max length of any of the melodies we're matching
+(defonce melody-ring (r/atom '()))
+(defn update-melody-ring [message]
+  (when-let [note-message (raw-midi->note (array-seq message.data))]
+    (if (= :noteon (:type note-message))
+      (swap! melody-ring (comp #(take RING-MAX-SIZE %) conj) (:pitch note-message)))))
+
 (defn on-midi-message [message]
-  (js/console.log message))
+  (update-melody-ring message))
 
 (defn set-current-input! [state input]
   (when-let [old-input (:current-input @state)]
@@ -43,8 +61,13 @@
     [:p "The current input is named " input.name]
     [:p "No input selected"]))
 
+(defn melody-display []
+  [:p (for [pitch @melody-ring]
+        (str pitch " "))])
+
 (defn midi-control [midi-state]
   (when (:access @midi-state)
     [:div
-     (current-input-name midi-state)
-     (midi-input-list midi-state)]))
+     [current-input-name midi-state]
+     [midi-input-list midi-state]
+     [melody-display]]))
