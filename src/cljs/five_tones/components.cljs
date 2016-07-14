@@ -21,9 +21,10 @@
     ;; if our currently-selected input is no longer available, ditch it
     (when-not (current-input-available current-input inputs)
       (swap! state assoc :current-input
-             (if (empty? inputs) nil (first (vals inputs)))))
+             (if (empty? inputs) nil (last (vals inputs)))))
     [:select
-     {:on-change #(swap! state assoc :current-input (inputs (-> % .-target .-value)))}
+     {:on-change #(swap! state assoc :current-input (inputs (-> % .-target .-value)))
+      :value (if current-input current-input.id nil)}
      (for [input (vals inputs)]
        ^{:key input.id}
        [:option {:value input.id}
