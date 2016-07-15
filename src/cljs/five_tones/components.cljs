@@ -28,7 +28,9 @@
        [:h2 (topic-names topic) " Results"]
        (for [group groups]
          ^{:key (:id group)}
-         [:div {:className "listItem"} (:name group)])])))
+         [:div {:className "listItem"} (:name group)
+          [:br]
+          [:span {:style {:opacity "0.4"}} (:members group) " " (:who group)]])])))
 
 (def minPitch 48)
 (def maxPitch 72)
