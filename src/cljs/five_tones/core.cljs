@@ -27,12 +27,15 @@
 ;; -------------------------
 ;; Commands
 (defn topic-command [topic]
-  (swap! state assoc :mode :topic :topic topic)
+  (swap! state assoc
+         :mode :topic
+         :topic topic)
   (populate-events (name topic)))
 
 (defn noteon-command [pitch]
-  (swap! state assoc :mode :note)
-  (js/console.log "received note " pitch))
+  (swap! state assoc
+         :mode :note
+         :pitch pitch))
 
 (defn command-dispatcher []
   (go-loop []
