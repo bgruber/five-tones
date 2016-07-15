@@ -29,7 +29,8 @@
 (defn topic-command [topic]
   (swap! state assoc
          :mode :topic
-         :topic topic)
+         :topic topic
+         :events [])
   (populate-events (name topic)))
 
 (defn noteon-command [pitch]
