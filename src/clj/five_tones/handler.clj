@@ -3,6 +3,7 @@
             [compojure.route :refer [not-found resources]]
             [hiccup.page :refer [include-js include-css html5]]
             [five-tones.middleware :refer [wrap-middleware]]
+            [five-tones.meetup :as meetup]
             [config.core :refer [env]]))
 
 (def mount-target
@@ -37,6 +38,7 @@
   (GET "/" [] loading-page)
   (GET "/about" [] loading-page)
   (GET "/cards" [] cards-page)
+  (GET "/meetup/my-events" [] meetup/my-events)
   (resources "/")
   (not-found "Not Found"))
 

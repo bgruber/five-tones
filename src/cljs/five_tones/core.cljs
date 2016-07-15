@@ -1,19 +1,32 @@
 (ns five-tones.core
+  (:require-macros [cljs.core.async.macros :refer [go]])
   (:require [five-tones.components :as components]
+            [five-tones.meetup :as meetup]
             [reagent.core :as reagent :refer [atom]]
             [reagent.session :as session]
             [secretary.core :as secretary :include-macros true]
-            [accountant.core :as accountant]))
+            [accountant.core :as accountant]
+            [cljs.core.async :refer [<!]]))
 
 (defonce midi-state (reagent.core/atom {}))
 
 ;; -------------------------
 ;; Views
 
+(defonce events-state (atom ""))
+(defn populate-events []
+  (go (let [response (<! (meetup/fetch-my-events))]
+        (reset! events-state (:body response)))))
+(defn fetch-button []
+  [:div [:input {:type "button"
+                 :value "fetch events"
+                 :on-click populate-events}]])
+
 (defn home-page []
   [:div [:h2 "Welcome to five-tones"]
    [:div [:a {:href "/about"} "go to about page"]]
-   (components/midi-control midi-state)])
+   (components/midi-control midi-state)
+   [:div (fetch-button) (meetup/event-list events-state)]])
 
 (defn about-page []
   [:div [:h2 "About five-tones"]

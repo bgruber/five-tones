@@ -18,7 +18,9 @@
                   :scope "provided"]
                  [secretary "1.2.3"]
                  [venantius/accountant "0.1.7"
-                  :exclusions [org.clojure/tools.reader]]]
+                  :exclusions [org.clojure/tools.reader]]
+                 [clj-http "2.2.0"]
+                 [cljs-http "0.1.41"]]
 
   :plugins [[lein-environ "1.0.2"]
             [lein-cljsbuild "1.1.1"]
@@ -110,6 +112,7 @@
                    :injections [(require 'pjstadig.humane-test-output)
                                 (pjstadig.humane-test-output/activate!)]
 
+                   :resource-paths ["config/dev"]
                    :env {:dev true}}
 
              :uberjar {:hooks [minify-assets.plugin/hooks]
