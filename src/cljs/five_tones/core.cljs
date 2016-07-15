@@ -41,8 +41,10 @@
 
 (defn command-dispatcher []
   (go-loop []
-    (let [topic-key (<! components/command-channel)]
-      (populate-events (name topic-key)))
+    (let [[command value] (<! components/command-channel)]
+      (case command
+        :topic (populate-events (name value))
+        :noteon (js/console.log "received note " value)))
     (recur)))
 
 (defn mount-root []

@@ -46,8 +46,10 @@
 (defn get-command
   "Given the most recent notes played, return a command if it should be sent"
   [melody]
-  (when-let [matching-prefixes (filter #(check-prefix (second %) melody) prefixes)]
-    (ffirst matching-prefixes)))
+  (let [matching-prefixes (filter #(check-prefix (second %) melody) prefixes)]
+    (if (empty? matching-prefixes)
+      [:noteon (first melody)]
+      [:topic (ffirst matching-prefixes)])))
 
 (defonce melody-ring (r/atom '()))
 (defn update-melody-ring [message]
@@ -90,9 +92,6 @@
     [:p "The current input is named " input.name]
     [:p "No input selected"]))
 
-(defn melody-display []
-  [:p (for [pitch @melody-ring]
-        (str pitch " "))])
 
 (defonce midi-state (r/atom {}))
 (defn midi-control []
@@ -100,8 +99,7 @@
     [:div
      [:h4 "Midi chooser"]
      [current-input-name midi-state]
-     [midi-input-list midi-state]
-     [melody-display]]))
+     [midi-input-list midi-state]]))
 
 (defn init-midi [channel access]
   (swap! midi-state assoc :access access)
