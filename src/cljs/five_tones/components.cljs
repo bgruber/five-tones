@@ -36,7 +36,9 @@
      (take (count prefix) melody)))
 
 (def prefixes
-  {:pokemon [60]})
+  {:science-fiction [63 56 68 72 70]
+   :pokemon [67 67 65 62 62 62 58 60 62 62 60 58 58 60 62 65 67]})
+
 
 (def RING-MAX-SIZE 128) ;; TODO make this the max length of any of the melodies we're matching
 (defn get-command

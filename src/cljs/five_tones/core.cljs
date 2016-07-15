@@ -59,8 +59,9 @@
 
 (defn command-dispatcher []
   (go-loop []
-      (let [topic-key (<! components/command-channel)]
-        (populate-events (name topic-key)))))
+    (let [topic-key (<! components/command-channel)]
+      (populate-events (name topic-key)))
+    (recur)))
 
 (defn mount-root []
   (reagent/render [current-page] (.getElementById js/document "app")))
