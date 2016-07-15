@@ -46,9 +46,10 @@
            :style {:top (str (position pitch) "%") :background (str "hsl(" (hue pitch) ", 100%, 50%)")}}]]])
 
 (defn catOverlay [topic shown]
-  [:div {:className (if shown "catOverlay enter" "catOverlay")
-         :style {:backgroundImage "url(/SCI-FI_67162.jpg)"}}
-   [:h1 (topic-names topic)]])
+  (let [imgurl (if topic (str "url(/" (name topic) ".jpg)") "")]
+   [:div {:className (if shown "catOverlay enter" "catOverlay")
+          :style {:backgroundImage imgurl}}
+    [:h1 (topic-names topic)]]))
 
 (defn rick-content [state]
   [:div {:className "page"}
