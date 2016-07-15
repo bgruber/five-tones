@@ -38,9 +38,11 @@
 ;; Commands
 (defn topic-command [topic]
   (swap! state assoc
-         :mode :loading
+         :mode :note
          :topic topic
          :groups [])
+  (go (<! (async/timeout 150))
+      (swap! state assoc :mode :loading))
   (populate-groups topic))
 
 (defn noteon-command [pitch]

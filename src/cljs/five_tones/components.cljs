@@ -22,12 +22,13 @@
    :ghosts "Ghosts"})
 
 (defn results [topic state]
-  (when-let [groups (:groups @state)]
-   [:div {:className "bounds"}
-    [:h2 (topic-names topic) " Results"]
-    (for [group groups]
-      ^{:key (:id group)}
-      [:div {:className "listItem"} (:name group)])]))
+  (let [groups (:groups @state)]
+    (if (not (empty? groups))
+      [:div {:className "bounds"}
+       [:h2 (topic-names topic) " Results"]
+       (for [group groups]
+         ^{:key (:id group)}
+         [:div {:className "listItem"} (:name group)])])))
 
 (def minPitch 48)
 (def maxPitch 72)
