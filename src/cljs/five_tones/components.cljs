@@ -38,7 +38,7 @@
 (def prefixes
   {:pokemon [60]})
 
-(def RING-MAX-SIZE 10) ;; TODO make this the max length of any of the melodies we're matching
+(def RING-MAX-SIZE 128) ;; TODO make this the max length of any of the melodies we're matching
 (defn get-command
   "Given the most recent notes played, return a command if it should be sent"
   [melody]
