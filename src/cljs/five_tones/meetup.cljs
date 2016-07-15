@@ -14,7 +14,7 @@
 
 (def topicmap
   {:electronicmusic 411
-   :pokemon 165
+   :pokemon 2602
    :science-fiction 18864
    :ghosts 220})
 

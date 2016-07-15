@@ -19,12 +19,12 @@
    [:meta {:name "viewport"
            :content "width=device-width, initial-scale=1"}]
    [:title "The Five Tones"]
-   (include-css (if (env :dev) "/css/site.css" "/css/site.min.css"))])
+   (include-css (if (env :dev) "/css/rick.css" "/css/site.min.css"))])
 
 (def loading-page
   (html5
     (head)
-    [:body {:class "body-container"}
+    [:body
      mount-target
      (include-js "/js/app.js")]))
 

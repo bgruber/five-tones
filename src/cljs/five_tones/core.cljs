@@ -20,12 +20,12 @@
 
 (defn populate-groups [topic]
   (go (let [response (<! (meetup/fetch-groups topic))]
-        (js/console.log "got results for " topic)
+        (js/console.log "got results for " (name topic))
         (swap! state assoc :groups (:body response)))))
 
 (defn home-page []
   [:div
-   [midi/midi-control]
+   #_[midi/midi-control]
    [components/main-content state]])
 
 
