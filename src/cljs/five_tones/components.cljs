@@ -35,7 +35,7 @@
   (/ (* 100 (- pitch minPitch)) (- maxPitch minPitch)))
 
 (defn position [pitch]
-  (/ (* 100 (- pitch minPitch)) (- maxPitch minPitch)))
+  (/ (* 360 (- pitch minPitch)) (- maxPitch minPitch)))
 
 (defn the-score [pitch]
   [:div {:className "page"}
@@ -52,7 +52,7 @@
 (defn rick-content [state]
   [:div {:className "page"}
    (results :science-fiction state)
-   (the-score 55)
+   (the-score (:pitch @state))
    (catOverlay :science-fiction false)])
 
 (defn main-content [state]
