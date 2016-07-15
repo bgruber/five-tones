@@ -22,11 +22,12 @@
    :ghosts "Ghosts"})
 
 (defn results [topic state]
-  [:div {:className "bounds"}
-   [:h2 (topic-names topic) " Results"]
-   (for [group (:groups @state)]
-     ^{:key (:id group)}
-     [:div {:className "listItem"} (:name group)])])
+  (when-let [groups (:groups @state)]
+   [:div {:className "bounds"}
+    [:h2 (topic-names topic) " Results"]
+    (for [group groups]
+      ^{:key (:id group)}
+      [:div {:className "listItem"} (:name group)])]))
 
 (def minPitch 48)
 (def maxPitch 72)
@@ -51,7 +52,7 @@
 
 (defn rick-content [state]
   [:div {:className "page"}
-   (results :science-fiction state)
+   (results (:topic @state) state)
    (when (= :note (:mode @state))
     (the-score (:pitch @state)))
    (catOverlay (:topic @state) (= (:mode @state) :loading))])
