@@ -1,7 +1,16 @@
 (ns five-tones.components)
 
-(defn event-list [state]
+(defn event-list [topic state]
   [:div
-   [:h1 "Event list!"]
-   [:ul (for [event (:results @state)]
+   [:h2 (name topic)]
+   [:ul (for [event (-> @state :events :results)]
           ^{:key (:id event)} [:li (:name event)])]])
+
+(defn color-field [state]
+  [:div "Empty"])
+
+(defn main-content [state]
+  (let [mode (:mode @state)]
+    (case mode
+      :topic (event-list (:topic @state) state)
+      :note (color-field state))))

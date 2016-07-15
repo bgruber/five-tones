@@ -11,17 +11,38 @@
 ;; -------------------------
 ;; Views
 
-(defonce events-state (atom {}))
+(defonce state (atom {:mode :note :pitch 0}))
 
 (defn populate-events [topic]
   (go (let [response (<! (meetup/fetch-topic-events topic))]
         (js/console.log "got results for " topic)
-        (reset! events-state (:body response)))))
+        (swap! state assoc :events (:body response)))))
 
 (defn home-page []
   [:div
    [midi/midi-control]
-   [components/event-list events-state]])
+   [components/main-content state]])
+
+
+;; -------------------------
+;; Commands
+(defn topic-command [topic]
+  (swap! state assoc :mode :topic :topic topic)
+  (populate-events (name topic)))
+
+(defn noteon-command [pitch]
+  (swap! state assoc :mode :note)
+  (js/console.log "received note " pitch))
+
+(defn command-dispatcher []
+  (go-loop []
+    (let [[command value] (<! midi/command-channel)]
+      (js/console.log (str "command: " command " value: " value))
+      (case command
+        :topic (topic-command value)
+        :noteon (noteon-command value)))
+    (recur)))
+
 
 ;; -------------------------
 ;; Initialize app
@@ -37,14 +58,6 @@
                          (js/console.log "Got midi change event")
                          (async/put! channel event))))
                #(js/console.log "failed to init midi")))))
-
-(defn command-dispatcher []
-  (go-loop []
-    (let [[command value] (<! midi/command-channel)]
-      (case command
-        :topic (populate-events (name value))
-        :noteon (js/console.log "received note " value)))
-    (recur)))
 
 (defn mount-root []
   (reagent/render [home-page] (.getElementById js/document "app")))
