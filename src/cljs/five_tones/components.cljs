@@ -1,7 +1,9 @@
 (ns five-tones.components
+  (:require-macros [cljs.core.async.macros :refer [go-loop]])
   (:require [reagent.core :as r]
             [cljs.core.async :as async]))
 
+;; used to send commands back to the main app
 (defonce command-channel (async/chan))
 
 (defn input-map [midi]
@@ -63,15 +65,22 @@
   (aset input "onmidimessage" on-midi-message)
   (swap! state assoc :current-input input))
 
-(defn midi-input-list [state]
-  (let [current-input (:current-input @state)
-        inputs        (input-map (:access @state))] 
+(defonce midi-state (r/atom {}))
+(defn- update-inputs-state []
+  (let [current-input (:current-input @midi-state)
+        inputs        (input-map (:access @midi-state))]
+    (swap! midi-state assoc :inputs inputs)
     ;; if our currently-selected input is no longer available, ditch it
     (when-not (current-input-available? current-input inputs)
-      (set-current-input! state (if (empty? inputs) nil (last (vals inputs)))))
+      (set-current-input! midi-state (if (empty? inputs) nil (last (vals inputs)))))))
+
+(defn midi-input-list [state]
+  (let [current-input    (:current-input @state)
+        current-input-id (if current-input current-input.id nil)
+        inputs           (:inputs @state)] 
     [:select
      {:on-change #(set-current-input! state (inputs (-> % .-target .-value)))
-      :value (if current-input current-input.id nil)}
+      :value current-input-id}
      (for [input (vals inputs)]
        ^{:key input.id}
        [:option {:value input.id}
@@ -86,9 +95,18 @@
   [:p (for [pitch @melody-ring]
         (str pitch " "))])
 
-(defn midi-control [midi-state]
+(defn midi-control []
   (when (:access @midi-state)
     [:div
      [current-input-name midi-state]
      [midi-input-list midi-state]
      [melody-display]]))
+
+(defn init-midi [channel access]
+  (swap! midi-state assoc :access access)
+  (update-inputs-state)
+  (go-loop []
+    (let [event (async/<! channel)]
+      (js/console.log "Updating MIDI inputs")
+      (update-inputs-state))
+    (recur)))
