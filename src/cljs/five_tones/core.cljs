@@ -18,6 +18,11 @@
         (js/console.log "got results for " topic)
         (swap! state assoc :events (:body response)))))
 
+(defn populate-groups [topic]
+  (go (let [response (<! (meetup/fetch-groups topic))]
+        (js/console.log "got results for " topic)
+        (swap! state assoc :groups (:body response)))))
+
 (defn home-page []
   [:div
    [midi/midi-control]
@@ -30,8 +35,8 @@
   (swap! state assoc
          :mode :topic
          :topic topic
-         :events [])
-  (populate-events (name topic)))
+         :groups [])
+  (populate-groups topic))
 
 (defn noteon-command [pitch]
   (swap! state assoc

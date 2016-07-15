@@ -20,10 +20,18 @@
   (http/get (str base-url "/self/calendar")
             {:query-params {"key" meetup-api-key}}))
 
+(defn fetch-groups [topicid]
+  (http/get (str base-url "/find/groups")
+            {:query-params {"topic_id" topicid
+                            "key" meetup-api-key}}))
+
 (defn- proxy-response [response]
   (let [content-header (-> response (ring/find-header "Content-Type") second)]
     (-> (ring/response (:body response))
         (ring/header "Content-Type" content-header))))
+
+(defn groups [topicid]
+  (proxy-response (fetch-groups topicid)))
 
 (defn topic-events [topic]
   (proxy-response (fetch-events topic)))

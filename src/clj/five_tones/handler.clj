@@ -41,6 +41,7 @@
   (GET "/cards" [] cards-page)
   (GET "/meetup/my-events" [] meetup/my-events)
   (GET "/meetup/events/:topic" [topic] (meetup/topic-events topic))
+  (GET "/meetup/groups/:topicid" [topicid] (meetup/groups topicid))
   (resources "/")
   (not-found "Not Found"))
 
