@@ -52,7 +52,8 @@
 (defn rick-content [state]
   [:div {:className "page"}
    (results :science-fiction state)
-   (the-score (:pitch @state))
+   (when (= :note (:mode @state))
+    (the-score (:pitch @state)))
    (catOverlay (:topic @state) (= (:mode @state) :loading))])
 
 (defn main-content [state]
