@@ -1,6 +1,7 @@
 (ns five-tones.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [five-tones.midi :as midi]
+  (:require [five-tones.components :as components]
+            [five-tones.midi :as midi]
             [five-tones.meetup :as meetup]
             [reagent.core :as reagent :refer [atom]]
             [reagent.session :as session]
@@ -20,7 +21,7 @@
 (defn home-page []
   [:div
    [midi/midi-control]
-   [meetup/event-list events-state]])
+   [components/event-list events-state]])
 
 ;; -------------------------
 ;; Initialize app
