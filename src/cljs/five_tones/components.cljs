@@ -87,19 +87,12 @@
        [:option {:value input.id}
         input.name])]))
 
-(defn current-input-name [state]
-  (if-let [input (:current-input @state)]
-    [:p "The current input is named " input.name]
-    [:p "No input selected"]))
-
-
 (defonce midi-state (r/atom {}))
 (defn midi-control []
   (when (:access @midi-state)
     [:div
-     [:h4 "Midi chooser"]
-     [current-input-name midi-state]
-     [midi-input-list midi-state]]))
+     [:p "Choose MIDI Input: "
+      [midi-input-list midi-state]]]))
 
 (defn init-midi [channel access]
   (swap! midi-state assoc :access access)
