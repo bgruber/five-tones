@@ -1,5 +1,5 @@
 (ns five-tones.core
-  (:require-macros [cljs.core.async.macros :refer [go]])
+  (:require-macros [cljs.core.async.macros :refer [go go-loop]])
   (:require [five-tones.components :as components]
             [five-tones.meetup :as meetup]
             [reagent.core :as reagent :refer [atom]]
@@ -13,20 +13,17 @@
 ;; -------------------------
 ;; Views
 
-(defonce events-state (atom ""))
+(defonce events-state (atom {}))
+
 (defn populate-events []
   (go (let [response (<! (meetup/fetch-my-events))]
         (reset! events-state (:body response)))))
-(defn fetch-button []
-  [:div [:input {:type "button"
-                 :value "fetch events"
-                 :on-click populate-events}]])
 
 (defn home-page []
   [:div [:h2 "Welcome to five-tones"]
    [:div [:a {:href "/about"} "go to about page"]]
    (components/midi-control midi-state)
-   [:div (fetch-button) (meetup/event-list events-state)]])
+   (meetup/event-list events-state)])
 
 (defn about-page []
   [:div [:h2 "About five-tones"]
@@ -59,6 +56,12 @@
                (aset midi "onstatechange" midi-state-change))
              #(js/console.log "failed to init midi"))))
 
+(defn command-dispatcher []
+  (go-loop []
+      (let [command (<! components/command-channel)]
+        (case command
+          :fetch-events (populate-events)))))
+
 (defn mount-root []
   (reagent/render [current-page] (.getElementById js/document "app")))
 
@@ -72,4 +75,5 @@
        (secretary/locate-route path))})
   (accountant/dispatch-current!)
   (init-midi)
-  (mount-root))
+  (mount-root)
+  (command-dispatcher))

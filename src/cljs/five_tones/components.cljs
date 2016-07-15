@@ -1,5 +1,8 @@
 (ns five-tones.components
-  (:require [reagent.core :as r]))
+  (:require [reagent.core :as r]
+            [cljs.core.async :as async]))
+
+(defonce command-channel (async/chan))
 
 (defn input-map [midi]
   (when midi
@@ -26,15 +29,32 @@
        :pitch note
        :velocity velocity})))
 
+(defn- check-prefix
+  "returns true if melody starts with prefix"
+  [prefix melody]
+  (= prefix
+     (take (count prefix) melody)))
+
+(def prefixes
+  {:fetch-events [60]})
+
 (def RING-MAX-SIZE 10) ;; TODO make this the max length of any of the melodies we're matching
+(defn get-command
+  "Given the most recent notes played, return a command if it should be sent"
+  [melody]
+  (when-let [matching-prefixes (filter #(check-prefix (second %) melody) prefixes)]
+    (ffirst matching-prefixes)))
+
 (defonce melody-ring (r/atom '()))
 (defn update-melody-ring [message]
   (when-let [note-message (raw-midi->note (array-seq message.data))]
     (if (= :noteon (:type note-message))
-      (swap! melody-ring (comp #(take RING-MAX-SIZE %) conj) (:pitch note-message)))))
+      (get-command (swap! melody-ring (comp #(take RING-MAX-SIZE %) conj) (:pitch note-message))))))
 
 (defn on-midi-message [message]
-  (update-melody-ring message))
+  (when-let [command (update-melody-ring message)]
+    (js/console.log "command is " command)
+    (async/put! command-channel command)))
 
 (defn set-current-input! [state input]
   (when-let [old-input (:current-input @state)]
