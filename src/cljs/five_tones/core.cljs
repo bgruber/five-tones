@@ -1,13 +1,11 @@
 (ns five-tones.core
   (:require-macros [cljs.core.async.macros :refer [go go-loop]])
-  (:require [five-tones.components :as components]
+  (:require [five-tones.midi :as midi]
             [five-tones.meetup :as meetup]
             [reagent.core :as reagent :refer [atom]]
             [reagent.session :as session]
             [accountant.core :as accountant]
             [cljs.core.async :as async :refer [<!]]))
-
-(defonce midi-state (reagent.core/atom {}))
 
 ;; -------------------------
 ;; Views
@@ -21,7 +19,7 @@
 
 (defn home-page []
   [:div
-   [components/midi-control]
+   [midi/midi-control]
    [meetup/event-list events-state]])
 
 ;; -------------------------
@@ -32,7 +30,7 @@
     (-> (js/navigator.requestMIDIAccess)
         (.then (fn [midi]
                  (js/console.log "Got midi access!")
-                 (components/init-midi channel midi)
+                 (midi/init-midi channel midi)
                  (aset midi "onstatechange"
                        (fn [event]
                          (js/console.log "Got midi change event")
@@ -41,7 +39,7 @@
 
 (defn command-dispatcher []
   (go-loop []
-    (let [[command value] (<! components/command-channel)]
+    (let [[command value] (<! midi/command-channel)]
       (case command
         :topic (populate-events (name value))
         :noteon (js/console.log "received note " value)))

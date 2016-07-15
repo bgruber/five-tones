@@ -1,4 +1,4 @@
-(ns five-tones.components
+(ns five-tones.midi
   (:require-macros [cljs.core.async.macros :refer [go-loop]])
   (:require [reagent.core :as r]
             [cljs.core.async :as async]))
