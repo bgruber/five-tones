@@ -46,6 +46,7 @@
 (defn noteon-command [pitch]
   (swap! state assoc
          :mode :note
+         :topic nil
          :pitch pitch))
 
 (defn command-dispatcher []

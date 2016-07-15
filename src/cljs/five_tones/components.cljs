@@ -47,8 +47,8 @@
 
 (defn catOverlay [topic shown]
   (let [imgurl (if topic (str "url(/" (name topic) ".jpg)") "")]
-   [:div {:className (if shown "catOverlay enter" "catOverlay")
-          :style {:backgroundImage imgurl}}
+    [:div (conj {:className (if shown "catOverlay enter" "catOverlay")}
+                (if topic {:style {:backgroundImage imgurl}} nil))
     [:h1 (topic-names topic)]]))
 
 (defn rick-content [state]
