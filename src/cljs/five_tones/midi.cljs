@@ -88,11 +88,21 @@
         input.name])]))
 
 (defonce midi-state (r/atom {}))
+
+;; cause i needed a way to show the melodies so i could copy-paste them into the list
+(defn toggle-melody-display []
+  (swap! midi-state update-in [:melody-display] not))
+(defn melody-display []
+  [:p (for [pitch @melody-ring]
+        (str pitch " "))])
+
 (defn midi-control []
   (when (:access @midi-state)
     [:div
      [:p "Choose MIDI Input: "
-      [midi-input-list midi-state]]]))
+      [midi-input-list midi-state]]
+     (when (:melody-display @midi-state)
+       [melody-display])]))
 
 (defn init-midi [channel access]
   (swap! midi-state assoc :access access)
