@@ -3,17 +3,30 @@
             [config.core :refer [env]]
             [ring.util.response :as ring]))
 
-(def meetup-api-key (:meetup-dev-scott-api-key env))
+(def meetup-api-key (:meetup-api-key env))
 
-(def base-url "http://api.dev.meetup.com")
+(def base-url "https://api.meetup.com")
 
 (defn filter-headers [headers]
   (let [acceptable-headers #{"Content-Type"}]
    (filter (fn [k v] (acceptable-headers k)) headers)))
 
+(defn fetch-events [topic]
+  (http/get (str base-url "/2/open_events")
+            {:query-params {"topic" topic
+                            "key" meetup-api-key}}))
+
 (defn fetch-my-events []
   (http/get (str base-url "/self/calendar")
             {:query-params {"key" meetup-api-key}}))
+
+(defn- proxy-response [response]
+  (let [content-header (-> response (ring/find-header "Content-Type") second)]
+    (-> (ring/response (:body response))
+        (ring/header "Content-Type" content-header))))
+
+(defn topic-events [topic]
+  (proxy-response (fetch-events topic)))
 
 (defn my-events [req]
   (let [meetup-response (fetch-my-events)

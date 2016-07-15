@@ -39,6 +39,7 @@
   (GET "/about" [] loading-page)
   (GET "/cards" [] cards-page)
   (GET "/meetup/my-events" [] meetup/my-events)
+  (GET "/meetup/events/:topic" [topic] (meetup/topic-events topic))
   (resources "/")
   (not-found "Not Found"))
 
