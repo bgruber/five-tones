@@ -15,9 +15,15 @@
 (defn color-field [pitch]
   [:div pitch])
 
-(defn results [state]
+(def topic-names
+  {:science-fiction "Science Fiction"
+   :pokemon "Pokemon!"
+   :electronicmusic "Electronic Music"
+   :ghosts "Ghosts"})
+
+(defn results [topic state]
   [:div {:className "bounds"}
-   [:h2 "Some Category Results"]
+   [:h2 (topic-names topic) " Results"]
    (for [group (:groups @state)]
      ^{:key (:id group)}
      [:div {:className "listItem"} (:name group)])])
@@ -38,16 +44,16 @@
     [:div {:className "note"
            :style {:top (position pitch) :background (str "hsl(" (hue pitch) ", 100%, 50%)")}}]]])
 
-(defn catOverlay [shown]
+(defn catOverlay [topic shown]
   [:div {:className (if shown "catOverlay enter" "catOverlay")
          :style {:backgroundImage "url(/SCI-FI_67162.jpg)"}}
-   [:h1 "Some category"]])
+   [:h1 (topic-names topic)]])
 
 (defn rick-content [state]
   [:div {:className "page"}
-   (results state)
+   (results :science-fiction state)
    (the-score 55)
-   (catOverlay false)])
+   (catOverlay :science-fiction false)])
 
 (defn main-content [state]
   (rick-content state)
