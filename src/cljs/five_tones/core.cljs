@@ -23,6 +23,7 @@
 (defn populate-groups [topic]
   (go (let [response (<! (meetup/fetch-groups topic))]
         (js/console.log "got results for " (name topic))
+        (<! (async/timeout 2000))
         (swap! state assoc
                :groups (:body response)
                :mode :results))))
