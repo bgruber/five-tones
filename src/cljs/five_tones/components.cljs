@@ -22,12 +22,21 @@
      ^{:key (:id group)}
      [:div {:className "listItem"} (:name group)])])
 
-(defn the-score [position hue]
+(def minPitch 48)
+(def maxPitch 72)
+
+(defn hue [pitch]
+  (/ (* 100 (- pitch minPitch)) (- maxPitch minPitch)))
+
+(defn position [pitch]
+  (/ (* 100 (- pitch minPitch)) (- maxPitch minPitch)))
+
+(defn the-score [pitch]
   [:div {:className "page"}
    [:div {:className "scoreOverlay"}]
    [:div {:className "score"}
     [:div {:className "note"
-           :style {:top position :background (str "hsl(" hue ", 100%, 50%)")}}]]])
+           :style {:top (position pitch) :background (str "hsl(" (hue pitch) ", 100%, 50%)")}}]]])
 
 (defn catOverlay [shown]
   [:div {:className (if shown "catOverlay enter" "catOverlay")
@@ -37,7 +46,7 @@
 (defn rick-content [state]
   [:div {:className "page"}
    (results state)
-   (the-score 0 0)
+   (the-score 55)
    (catOverlay false)])
 
 (defn main-content [state]
