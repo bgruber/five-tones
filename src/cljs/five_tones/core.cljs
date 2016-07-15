@@ -16,12 +16,16 @@
 (defn populate-events [topic]
   (go (let [response (<! (meetup/fetch-topic-events topic))]
         (js/console.log "got results for " topic)
-        (swap! state assoc :events (:body response)))))
+        (swap! state assoc
+               :events (:body response)
+               :mode :results))))
 
 (defn populate-groups [topic]
   (go (let [response (<! (meetup/fetch-groups topic))]
         (js/console.log "got results for " (name topic))
-        (swap! state assoc :groups (:body response)))))
+        (swap! state assoc
+               :groups (:body response)
+               :mode :results))))
 
 (defn home-page []
   [:div
@@ -33,7 +37,7 @@
 ;; Commands
 (defn topic-command [topic]
   (swap! state assoc
-         :mode :topic
+         :mode :loading
          :topic topic
          :groups [])
   (populate-groups topic))

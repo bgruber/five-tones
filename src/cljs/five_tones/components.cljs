@@ -53,7 +53,7 @@
   [:div {:className "page"}
    (results :science-fiction state)
    (the-score (:pitch @state))
-   (catOverlay :science-fiction false)])
+   (catOverlay (:topic @state) (= (:mode @state) :loading))])
 
 (defn main-content [state]
   (rick-content state)
