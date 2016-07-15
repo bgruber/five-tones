@@ -33,17 +33,17 @@
 (def maxPitch 72)
 
 (defn hue [pitch]
-  (/ (* 100 (- pitch minPitch)) (- maxPitch minPitch)))
+  (* 280 (/ (- pitch minPitch) (- maxPitch minPitch))))
 
 (defn position [pitch]
-  (/ (* 360 (- pitch minPitch)) (- maxPitch minPitch)))
+  (/ (* 100 (- pitch minPitch)) (- maxPitch minPitch)))
 
 (defn the-score [pitch]
   [:div {:className "page"}
    [:div {:className "scoreOverlay"}]
    [:div {:className "score"}
     [:div {:className "note"
-           :style {:top (position pitch) :background (str "hsl(" (hue pitch) ", 100%, 50%)")}}]]])
+           :style {:top (str (position pitch) "%") :background (str "hsl(" (hue pitch) ", 100%, 50%)")}}]]])
 
 (defn catOverlay [topic shown]
   [:div {:className (if shown "catOverlay enter" "catOverlay")
