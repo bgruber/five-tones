@@ -15,8 +15,9 @@
 
 (defonce events-state (atom {}))
 
-(defn populate-events []
-  (go (let [response (<! (meetup/fetch-my-events))]
+(defn populate-events [topic]
+  (go (let [response (<! (meetup/fetch-topic-events topic))]
+        (js/console.log "got results for " topic)
         (reset! events-state (:body response)))))
 
 (defn home-page []
@@ -58,9 +59,8 @@
 
 (defn command-dispatcher []
   (go-loop []
-      (let [command (<! components/command-channel)]
-        (case command
-          :fetch-events (populate-events)))))
+      (let [topic-key (<! components/command-channel)]
+        (populate-events (name topic-key)))))
 
 (defn mount-root []
   (reagent/render [current-page] (.getElementById js/document "app")))

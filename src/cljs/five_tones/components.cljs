@@ -36,7 +36,7 @@
      (take (count prefix) melody)))
 
 (def prefixes
-  {:fetch-events [60]})
+  {:pokemon [60]})
 
 (def RING-MAX-SIZE 10) ;; TODO make this the max length of any of the melodies we're matching
 (defn get-command
@@ -53,7 +53,6 @@
 
 (defn on-midi-message [message]
   (when-let [command (update-melody-ring message)]
-    (js/console.log "command is " command)
     (async/put! command-channel command)))
 
 (defn set-current-input! [state input]
