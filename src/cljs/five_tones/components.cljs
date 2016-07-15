@@ -65,14 +65,13 @@
   (aset input "onmidimessage" on-midi-message)
   (swap! state assoc :current-input input))
 
-(defonce midi-state (r/atom {}))
-(defn- update-inputs-state []
-  (let [current-input (:current-input @midi-state)
-        inputs        (input-map (:access @midi-state))]
-    (swap! midi-state assoc :inputs inputs)
+(defn- update-inputs-state [state]
+  (let [current-input (:current-input @state)
+        inputs        (input-map (:access @state))]
+    (swap! state assoc :inputs inputs)
     ;; if our currently-selected input is no longer available, ditch it
     (when-not (current-input-available? current-input inputs)
-      (set-current-input! midi-state (if (empty? inputs) nil (last (vals inputs)))))))
+      (set-current-input! state (last (vals inputs))))))
 
 (defn midi-input-list [state]
   (let [current-input    (:current-input @state)
@@ -95,18 +94,20 @@
   [:p (for [pitch @melody-ring]
         (str pitch " "))])
 
+(defonce midi-state (r/atom {}))
 (defn midi-control []
   (when (:access @midi-state)
     [:div
+     [:h4 "Midi chooser"]
      [current-input-name midi-state]
      [midi-input-list midi-state]
      [melody-display]]))
 
 (defn init-midi [channel access]
   (swap! midi-state assoc :access access)
-  (update-inputs-state)
+  (update-inputs-state midi-state)
   (go-loop []
     (let [event (async/<! channel)]
       (js/console.log "Updating MIDI inputs")
-      (update-inputs-state))
+      (update-inputs-state midi-state))
     (recur)))
